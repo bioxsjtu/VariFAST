@@ -1,0 +1,29 @@
+All bam files are suggested to capture first according to the location of variants using samtools as follow and all bam files should be transform to sam.
+
+samtools view -b -L yourvariant.bed -o your.capture.bam your.bam
+samtools view -h your.capture.bam your.sam
+
+Then, you should provide two input files. One contains the information of the variants, for example（mut_info.csv) as follows. all variants should be normalized 
+
+sample,Chr,Start,Ref,Alt
+GUB11031_vs_GU11019,chr1,1019757,T,C
+GUB11031_vs_GU11019,chr11,1629156,T,A
+GUB11031_vs_GU11019,chr2,95541357,GA,-
+
+The other contains the sam path, for example (sam_file.csv) as follows, for somatic variants, it should contain three columns
+sample,case,control
+GUB11031_vs_GU11019,./GUB11031_vs_GU11019_T_captured.sam,./GUB11031_vs_GU11019_N_captured.sam
+
+for germline variants, it should contain two columns, like follows,
+sample,case
+GUB11031_vs_GU11019,./GUB11031_vs_GU11019_captured.sam
+
+Two files should be Comma Separated.
+A simple example for somatic variants is like follows:
+
+python VariFAST.py --vcf NA12878_whole.csv -p 64 --sam sam_file.csv --ref /lustre/home/acct-bioxwz/bioxwz/database/hg19/hg19.fa --vaf 0.2 -d 20 --duplicated
+the paramter -p means number of threads. --ref means the path of reference genome. --vaf means the threshold of minimum variant allel frequency. -d means the threshold of minium depth.
+
+A simple example for germline variants is like follows:
+python VariFAST.py --vcf NA12878_whole.csv -p 64 --sam sam_file.csv --ref /lustre/home/acct-bioxwz/bioxwz/database/hg19/hg19.fa --vaf 0.2 -d 20 -nd 20 --duplicated --paired
+the paramter -nd means the minimum depth for normal track.
